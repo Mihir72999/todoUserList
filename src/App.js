@@ -198,11 +198,11 @@ if(isError){
     <button className='absolute right-1 ' onClick={()=>setOpenModal(false)} >X</button>
       <div>update the user</div>
       <div className='flex flex-col text-left px-3 my-3 py-2'>
-      <label className='py-2'>name</label>
+      <label className='py-2'>update your name</label>
       <input type='text' value={update.upsertName.length ? update.upsertName : userName} name='name' onChange={(e)=>setUpdate({...update, upsertName:e.target.value})} className='py-2 px-2' placeholder='jhon doe' />
-      <label className='py-2'>enter your email</label>
+      <label className='py-2'>update your email</label>
       <input type='email' name='email' value={update.upsertEmail.length ? update.upsertEmail : userEmail } onChange={(e)=>setUpdate({...update , upsertEmail:e.target.value})} className='py-2 px-2' placeholder='example@gmail.com' />
-      <label className='py-2'>enter your email</label>
+      <label className='py-2'>enter your password</label>
       <input type='password' name='password' value={update.upsertPassword} onChange={(e)=>setUpdate({...update , upsertPassword:e.target.value})} className='py-2 px-2' placeholder='********' />
    
       </div>
