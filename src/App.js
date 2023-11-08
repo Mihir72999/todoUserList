@@ -68,7 +68,7 @@ const handleOpenModal = (usersName , usersEmail) =>{
 const handleUpdateUser = async() =>{
   try{
 
-  const data =  await fetch(`http://localhost:3500/updateUser/${userName}`,{
+  const data =  await fetch(`https://todouserapi.onrender.com/updateUser/${userName}`,{
       method:'PATCH',
       headers:{
         'Content-Type':'application/json'
