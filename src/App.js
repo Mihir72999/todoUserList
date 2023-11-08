@@ -1,58 +1,60 @@
 import { useEffect, useState } from 'react';
 import './App.css';
+import {useDeleteUserMutation, usePostUserMutation} from './redux/userAddapter';
+import { useDispatch, useSelector } from 'react-redux';
+import { allUserData} from './redux/userReducer';
+import CircleLoader	from "react-spinners/CircleLoader";
+
+
+
+
+
+
 
 function App() {
 const [name ,setName]  = useState("")
 const [email , setEmail] = useState("")
-const [user , setUser] = useState([])
+const [password,setPassword] = useState("")
 const [userName , setUserName] = useState("")
 const [userEmail , setUserEmail] = useState("")
 const [update , setUpdate] = useState({
   upsertName:'' ,
+  upsertPassword:'',
   upsertEmail:''})
+  const dispatch = useDispatch()
 const [openModal , setOpenModal] = useState(false)
+const override = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
+};
 
 // get state of user's name and email
 const handleName = e => setName(e.target.value)
 const handleEmail = e => setEmail(e.target.value)
-
+const handlePassword = e =>setPassword(e.target.value)
 //get user data from database in to do list
-const fetchData = async()=>{
-  const data = await fetch('/app/data-xeyhk/endpoint/user')
-  const getData = await data.json()
-  console.log(getData)
-  
-  return getData
-}
+const { allUser:user , isLoading , isError} = useSelector(state=>state.user)
 
+const [postUser,{isError:onError , error} ] = usePostUserMutation()
 
 // create user in to do list
 const handleSubmit = async(e) =>{
  
   e.preventDefault()
-  const createdAt = Intl.DateTimeFormat('en-IN' , {timeStyle:'long' ,dateStyle:'long'}).format(Date.now())
-  const data = await fetch('/app/data-xeyhk/endpoint/postUser',{
-    headers:{'Contente-Type':'application/json'},
-    method:'POST',
-    mode:'no-cors',
-    body:JSON.stringify({name ,email , createdAt})
-  })
-  console.log(data)
-
-  setEmail("")
-  setName("")
-  fetchData().then(res=>setUser(res))
+ await postUser({name, email , password})
+ 
+ setEmail("")
+ setName("")
+ setPassword("") 
+ dispatch(allUserData())
 }
 
 //to delete user from to do list
-const handleDelete = async(body)=>{
-  const data = await fetch(`/app/data-xeyhk/endpoint/deleteuser?name=${body}`,{
-    method:'DELETE'
-  })
-  const moreData = await data.json()
-  console.log(moreData)
-  fetchData().then(res=>setUser(res))
-  
+const [deleteUser] = useDeleteUserMutation()
+const handleDelete = async(name)=>{
+  await deleteUser({name})
+  dispatch(allUserData())
 }
 
 //to open the modal for update user
@@ -62,34 +64,60 @@ const handleOpenModal = (usersName , usersEmail) =>{
   setUserName(usersName)
 }
 
-
 //update the userData 
 const handleUpdateUser = async() =>{
-  const data = await fetch(`/app/data-xeyhk/endpoint/updateUser?name=${userName}`,{
-    method:'PATCH',
-    body:JSON.stringify({
-      name:update.upsertName || userName,
-    email:update.upsertEmail || userEmail
-    })
+  try{
+
+  const data =  await fetch(`http://localhost:3500/updateUser/${userName}`,{
+      method:'PATCH',
+      headers:{
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        name:update.upsertName || userName,
+    email:update.upsertEmail || userEmail,
+    password:update.upsertPassword
   })
- const respData = await data.json()
- console.log(respData)
- setUpdate({...update , upsertEmail:'' , upsertName:''})
- fetchData().then(res=>setUser(res))
+ })
+  await data.json()
+ dispatch(allUserData())
+ setUpdate({...update,upsertName:'' , upsertEmail:'' , upsertPassword:''})
+ 
  setOpenModal(false)
+}catch(err){
+  alert(err.message)
+}
+ 
 }
 
-//get data when page load
+// get data when page load
 useEffect(()=>{
-  fetchData().then(res=>setUser(res))
-},[])
+
+  dispatch(allUserData())
+},[ dispatch])
+if(isLoading){
+  return  <CircleLoader	
+  color={'blue'}
+  loading={isLoading}
+  cssOverride={override}
+  size={50}
+  aria-label="Loading Spinner"
+  data-testid="loader"
+/>
+
+}
+if(isError){
+  return <div>went something wrong</div>
+}
   return (
+    <>
+       
     <div className="App my-5">
         <p >welcome to our test monngodb-atlas app services</p>
-
+       {onError && <div aria-live='assertive'>{error?.message}</div>}
 
          {/* form to create user data  */}
-        <div  className="space-y-6 w-fit mx-auto ">
+        <div  className="space-y-6 w-fit mx-auto">
             <div className='w-[230px]'>
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                 Email address
@@ -113,7 +141,7 @@ useEffect(()=>{
                enter your name
               </label>          
               <div className="mt-2">
-                <input
+               <input
                 value={name}
                 onChange={handleName}
                   id="name"
@@ -125,7 +153,23 @@ useEffect(()=>{
                 />
               </div>
             </div>
-
+            <div>
+            <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+               enter your password
+              </label>          
+              <div className="mt-2">
+                <input
+                value={password}
+                onChange={handlePassword}
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="off"
+                  required
+                  className="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
             <div>
               <button
                 type="submit"
@@ -155,9 +199,12 @@ useEffect(()=>{
       <div>update the user</div>
       <div className='flex flex-col text-left px-3 my-3 py-2'>
       <label className='py-2'>name</label>
-      <input type='text' value={update.upsertName} name='name' onChange={(e)=>setUpdate({...update, upsertName:e.target.value})} className='py-2 px-2' placeholder='jhon doe' />
+      <input type='text' value={update.upsertName.length ? update.upsertName : userName} name='name' onChange={(e)=>setUpdate({...update, upsertName:e.target.value})} className='py-2 px-2' placeholder='jhon doe' />
       <label className='py-2'>enter your email</label>
-      <input type='email' name='email' value={update.upsertEmail } onChange={(e)=>setUpdate({...update , upsertEmail:e.target.value})} className='py-2 px-2' placeholder='example@gmail.com' />
+      <input type='email' name='email' value={update.upsertEmail.length ? update.upsertEmail : userEmail } onChange={(e)=>setUpdate({...update , upsertEmail:e.target.value})} className='py-2 px-2' placeholder='example@gmail.com' />
+      <label className='py-2'>enter your email</label>
+      <input type='password' name='password' value={update.upsertPassword} onChange={(e)=>setUpdate({...update , upsertPassword:e.target.value})} className='py-2 px-2' placeholder='********' />
+   
       </div>
       <button
                 type="submit"
@@ -168,6 +215,7 @@ useEffect(()=>{
               </button>
     </div>}
     </div>
+    </>
   );
 }
 
