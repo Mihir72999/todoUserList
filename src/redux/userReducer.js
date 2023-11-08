@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 export const allUserData = createAsyncThunk('userData',async()=>{
-    const data = await fetch('http://localhost:3500/getUser')
+    const data = await fetch('https://todouserapi.onrender.com/getUser')
    return data.json()
 })
 const userReducer = createSlice({
