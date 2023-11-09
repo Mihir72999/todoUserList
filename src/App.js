@@ -185,16 +185,15 @@ if(isError){
                 type="submit"
                 className="flex w-full justify-center rounded-md disabled:bg-indigo-300 bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 onClick={handleSubmit}
-                disabled={email.length < 10 || name.length < 3}
+                disabled={email.length < 10 || name.length < 3 || password.length < 3}
               >
                 Add To do
               </button>
             </div>
           </div>
-    {/* complete todo form */}
+          {/* complete todo form */}
 
-                  
-    {/* create user List table */}
+          {/* create user List table */}
           {user?.length && <table  className='w-[25%] lg:scale-100 scale-90  my-10'>
             <thead >
              <tr>
@@ -219,8 +218,6 @@ if(isError){
         {!user.length && <div className='flex justify-center'>no user available</div>}       
             {/* end table */}
  
- 
-
     {/* open the modal to update userData  */}
    {openModal && <div className='fixed  w-[300px] left-12 top-10 lg:left-[42%] my-9 text-center bg-zinc-200 text-gray-700'>
     <button className='absolute right-1 ' onClick={()=>setOpenModal(false)} >X</button>
@@ -254,6 +251,7 @@ if(isError){
       </div>
       </div>}
     {/* close delete user modal */}
+
     </div>
     </>
   );
