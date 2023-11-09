@@ -4,8 +4,8 @@ import {useDeleteUserMutation, usePostUserMutation} from './redux/userAddapter';
 import { useDispatch, useSelector } from 'react-redux';
 import { allUserData} from './redux/userReducer';
 import CircleLoader	from "react-spinners/CircleLoader";
-
-
+import { AiOutlineDelete} from 'react-icons/ai'
+import {LiaEdit} from 'react-icons/lia'
 
 
 
@@ -21,8 +21,11 @@ const [update , setUpdate] = useState({
   upsertName:'' ,
   upsertPassword:'',
   upsertEmail:''})
-  const dispatch = useDispatch()
 const [openModal , setOpenModal] = useState(false)
+const [deleteModal ,setDeleteModal] = useState(false)
+const [deletePassword , setDeletePassword] = useState("")
+
+const dispatch = useDispatch()
 const override = {
   display: "block",
   margin: "0 auto",
@@ -36,7 +39,7 @@ const handlePassword = e =>setPassword(e.target.value)
 //get user data from database in to do list
 const { allUser:user , isLoading , isError} = useSelector(state=>state.user)
 
-const [postUser,{isError:onError , error} ] = usePostUserMutation()
+const [postUser,{isError:onError , error} ] = usePostUserMutation({par:'mihir patel'})
 
 // create user in to do list
 const handleSubmit = async(e) =>{
@@ -52,9 +55,11 @@ const handleSubmit = async(e) =>{
 
 //to delete user from to do list
 const [deleteUser] = useDeleteUserMutation()
-const handleDelete = async(name)=>{
-  await deleteUser({name})
+const handleDelete = async()=>{
+  await deleteUser({password:deletePassword})
   dispatch(allUserData())
+  setDeletePassword("")
+  setDeleteModal(false)
 }
 
 //to open the modal for update user
@@ -87,9 +92,13 @@ const handleUpdateUser = async() =>{
 }catch(err){
   alert(err.message)
 }
+
+}
+// handle open delete modal
+const handleDeleteModal = () =>{
+  setDeleteModal(true)
  
 }
-
 // get data when page load
 useEffect(()=>{
 
@@ -106,6 +115,7 @@ if(isLoading){
 />
 
 }
+
 if(isError){
   return <div>went something wrong</div>
 }
@@ -181,18 +191,33 @@ if(isError){
               </button>
             </div>
           </div>
+          {/* complete todo form */}
 
-          {/* get user data in list  */}
-    {user && user.map((users ,index)=>{
-      return <div key={index} className='mx-auto my-2 px-3 py-2 w-[225px] border border-black'>
-        <div>{users.name}</div>
-        <div>{users.email}</div>
-        <button onClick={()=>handleDelete(users.name)} className='bg-red-500 rounded-md px-2 py-1 text-white'>delete</button>
-        <button onClick={()=>handleOpenModal(users.name , users.email)} className='bg-blue-500 px-2 py-1 mx-3 rounded-md text-white'>edit</button>
-      </div>
-    })}     
-
-
+          {/* create user List table */}
+          {user?.length && <table  className='w-[25%] mx-auto lg:scale-100 scale-90  my-10'>
+            <thead >
+             <tr>
+              <th className='border border-gray-700 px-3 py-2'>name</th>
+              <th className='border border-gray-700 px-3 py-2'>email</th>
+              <th className='border border-gray-700 px-3 py-2'>edit</th>
+              <th className='border border-gray-700 px-3 py-2'>delete</th>
+              </tr> 
+            </thead>
+              <tbody>
+              {user && user.map(users=>{
+                return <tr key={users.id}>
+                  <td className='border border-gray-700 px-3 py-2'>{users.name}</td>
+                  <td className='border border-gray-700 px-3 py-2'>{users.email}</td>
+                  <td onClick={()=>handleOpenModal(users.name , users.email)} className='border border-gray-700 px-3 py-2'><LiaEdit/></td>
+                  <td onClick={handleDeleteModal} className='border border-gray-700 px-3 py-2'><AiOutlineDelete/></td>
+                </tr>
+              })}   
+            </tbody>
+           </table>
+        }
+        {!user.length && <div className='flex justify-center'>no user available</div>}       
+            {/* end table */}
+ 
     {/* open the modal to update userData  */}
    {openModal && <div className='fixed  w-[300px] left-12 top-10 lg:left-[42%] my-9 text-center bg-zinc-200 text-gray-700'>
     <button className='absolute right-1 ' onClick={()=>setOpenModal(false)} >X</button>
@@ -202,7 +227,7 @@ if(isError){
       <input type='text' value={update.upsertName.length ? update.upsertName : userName} name='name' onChange={(e)=>setUpdate({...update, upsertName:e.target.value})} className='py-2 px-2' placeholder='jhon doe' />
       <label className='py-2'>enter your email</label>
       <input type='email' name='email' value={update.upsertEmail.length ? update.upsertEmail : userEmail } onChange={(e)=>setUpdate({...update , upsertEmail:e.target.value})} className='py-2 px-2' placeholder='example@gmail.com' />
-      <label className='py-2'>enter your email</label>
+      <label className='py-2'>enter your password</label>
       <input type='password' name='password' value={update.upsertPassword} onChange={(e)=>setUpdate({...update , upsertPassword:e.target.value})} className='py-2 px-2' placeholder='********' />
    
       </div>
@@ -214,6 +239,19 @@ if(isError){
                 update User
               </button>
     </div>}
+    {/* close update modal  */}
+
+    {/* open delete user modal  */}
+    {deleteModal && <div className='fixed right-0 top-0 left-0 bottom-0 bg-slate-100 '>
+    <div className='flex flex-col w-[200px] justify-center mx-auto  bg-zinc-200 text-left px-3 my-[200px] py-2'>
+    <button className='relative ' onClick={()=>setDeleteModal(false)} >X</button>
+    <label className='py-2'>enter your password</label>
+    <input type='password' name='password' value={deletePassword} onChange={(e)=>setDeletePassword(e.target.value)} className='py-2 px-2' placeholder='********' />
+     <button className='bg-sky-600 text-white w-full my-3 py-3 rounded-md' onClick={handleDelete}>delete todo</button>
+      </div>
+      </div>}
+    {/* close delete user modal */}
+
     </div>
     </>
   );

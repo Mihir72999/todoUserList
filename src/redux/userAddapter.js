@@ -4,10 +4,10 @@ export const userAddapter = userSlice.injectEndpoints({
     endpoints:(builder)=>({
      
       postUser:builder.mutation({
-        query:(body)=>({
+        query:(body )=>({
          url:'postUser',
          method:'POST',
-         params:'data',
+         params:'ripal patel',
          body:{...body}   
         }),
         transformErrorResponse:response=>response.data
