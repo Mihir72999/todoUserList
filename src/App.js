@@ -233,7 +233,7 @@ if(isError){
     {/* open delete user modal  */}
     {deleteModal && <div className='fixed right-0 top-0 left-0 bottom-0 bg-slate-100 '>
     <div className='flex flex-col w-[200px] justify-center mx-auto  bg-zinc-200 text-left px-3 my-[200px] py-2'>
-    <button className='absolute right-1 ' onClick={()=>setOpenModal(false)} >X</button>
+    <button className='relative right-1 ' onClick={()=>setDeleteModal(true)} >X</button>
     <label className='py-2'>enter your password</label>
     <input type='password' name='password' value={deletePassword} onChange={(e)=>setDeletePassword(e.target.value)} className='py-2 px-2' placeholder='********' />
      <button className='bg-sky-600 text-white w-full my-3 py-3 rounded-md' onClick={handleDelete}>delete todo</button>
