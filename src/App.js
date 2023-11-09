@@ -194,7 +194,7 @@ if(isError){
           {/* complete todo form */}
 
           {/* create user List table */}
-          {user?.length && <table  className='w-[25%] lg:scale-100 scale-90  my-10'>
+          {user?.length && <table  className='w-[25%] mx-auto lg:scale-100 scale-90  my-10'>
             <thead >
              <tr>
               <th className='border border-gray-700 px-3 py-2'>name</th>
