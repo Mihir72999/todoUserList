@@ -120,9 +120,9 @@ if(isError){
        
     <div className="App my-5">
         <p >welcome to our test monngodb-atlas app services</p>
-       {onError && <div className='text-center' aria-live='assertive'>{error?.message}</div>}
-       {getDeleteError && <div className='text-center' aria-live='assertive'>{deleteError?.message}</div>}
-       {getUpdateError && <div className='text-center' aria-live='assertive'>{updateError?.message}</div>}
+       {onError && <div className='text-center text-red-600 font-semibold' aria-live='assertive'>{error?.message}</div>}
+       {getDeleteError && <div className='text-center text-red-600 font-semibold' aria-live='assertive'>{deleteError?.message}</div>}
+       {getUpdateError && <div className='text-center text-red-600 font-semibold ' aria-live='assertive'>{updateError?.message}</div>}
 
          {/* form to create user data  */}
         <div  className="space-y-6 w-fit mx-auto">
