@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import {useDeleteUserMutation,useUpdateUserMutation, usePostUserMutation} from './redux/userAddapter';
+import {useDeleteUserMutation , useUpdateUserMutation, usePostUserMutation} from './redux/userAddapter';
 import { useDispatch, useSelector } from 'react-redux';
 import { allUserData} from './redux/userReducer';
 import CircleLoader	from "react-spinners/CircleLoader";
@@ -39,7 +39,7 @@ const handlePassword = e =>setPassword(e.target.value)
 //get user data from database in to do list
 const { allUser:user , isLoading , isError} = useSelector(state=>state.user)
 
-const [postUser,{isError:onError , error} ] = usePostUserMutation({par:'mihir patel'})
+const [postUser,{isError:onError , error} ] = usePostUserMutation()
 
 // create user in to do list
 const handleSubmit = async(e) =>{
@@ -54,7 +54,7 @@ const handleSubmit = async(e) =>{
 }
 
 //to delete user from to do list
-const [deleteUser] = useDeleteUserMutation()
+const [deleteUser , {isError:getDeleteError ,error:deleteError}] = useDeleteUserMutation()
 const handleDelete = async()=>{
   await deleteUser({password:deletePassword})
   dispatch(allUserData())
@@ -70,7 +70,7 @@ const handleOpenModal = (usersName , usersEmail) =>{
 }
 
 //update the userData 
-const [updateUser] = useUpdateUserMutation()
+const [updateUser , {isError:getUpdateError , error:updateError}] = useUpdateUserMutation()
 const handleUpdateUser = async() =>{
   try{
 
@@ -79,19 +79,17 @@ const handleUpdateUser = async() =>{
     email:update.upsertEmail || userEmail,
     password:update.upsertPassword
   })
- dispatch(allUserData())
  
- setUpdate({...update,upsertName:'' , upsertEmail:'' , upsertPassword:''})
   
- setOpenModal(false)
+ dispatch(allUserData())
+ setUpdate({...update,upsertName:'' , upsertEmail:'' , upsertPassword:''})
  
+ setOpenModal(false)
 }catch(err){
   alert(err.message)
 }
 }
 
-
-  
 // handle open delete modal
 const handleDeleteModal = () =>{
   setDeleteModal(true)
@@ -122,7 +120,9 @@ if(isError){
        
     <div className="App my-5">
         <p >welcome to our test monngodb-atlas app services</p>
-       {onError && <div aria-live='assertive'>{error?.message}</div>}
+       {onError && <div className='text-center' aria-live='assertive'>{error?.message}</div>}
+       {getDeleteError && <div className='text-center' aria-live='assertive'>{deleteError?.message}</div>}
+       {getUpdateError && <div className='text-center' aria-live='assertive'>{updateError?.message}</div>}
 
          {/* form to create user data  */}
         <div  className="space-y-6 w-fit mx-auto">
