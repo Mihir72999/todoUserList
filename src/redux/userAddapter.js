@@ -7,11 +7,12 @@ export const userAddapter = userSlice.injectEndpoints({
         query:(body )=>({
          url:'postUser',
          method:'POST',
-         params:'ripal patel',
          body:{...body}   
         }),
+      
         transformErrorResponse:response=>response.data
       }),
+     
       deleteUser:builder.mutation({
         query:(body)=>({
       
@@ -20,8 +21,17 @@ export const userAddapter = userSlice.injectEndpoints({
           body:{...body}
         }),
         transformErrorResponse:response=>response.data
+      }),
+      updateUser:builder.mutation({
+        query:(body)=>({
+          url:'updateUser',
+          method:'PATCH',
+          body:{...body}
+        }),
+        transformErrorResponse:response=>response.data
       })  
     })
 })
+          
 
-export const { usePostUserMutation , useDeleteUserMutation} = userAddapter
+export const { usePostUserMutation , useUpdateUserMutation , useDeleteUserMutation} = userAddapter
