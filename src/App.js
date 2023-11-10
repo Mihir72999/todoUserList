@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import {useDeleteUserMutation, usePostUserMutation} from './redux/userAddapter';
+import {useDeleteUserMutation,useUpdateUserMutation, usePostUserMutation} from './redux/userAddapter';
 import { useDispatch, useSelector } from 'react-redux';
 import { allUserData} from './redux/userReducer';
 import CircleLoader	from "react-spinners/CircleLoader";
@@ -70,30 +70,28 @@ const handleOpenModal = (usersName , usersEmail) =>{
 }
 
 //update the userData 
+const [updateUser] = useUpdateUserMutation()
 const handleUpdateUser = async() =>{
   try{
 
-  const data =  await fetch(`http://localhost:3500/updateUser/${userName}`,{
-      method:'PATCH',
-      headers:{
-        'Content-Type':'application/json'
-      },
-      body:JSON.stringify({
+ await updateUser({
         name:update.upsertName || userName,
     email:update.upsertEmail || userEmail,
     password:update.upsertPassword
   })
- })
-  await data.json()
  dispatch(allUserData())
- setUpdate({...update,upsertName:'' , upsertEmail:'' , upsertPassword:''})
  
+ setUpdate({...update,upsertName:'' , upsertEmail:'' , upsertPassword:''})
+  
  setOpenModal(false)
+ 
 }catch(err){
   alert(err.message)
 }
-
 }
+
+
+  
 // handle open delete modal
 const handleDeleteModal = () =>{
   setDeleteModal(true)
